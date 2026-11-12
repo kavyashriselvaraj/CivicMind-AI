@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: civicmind_x_app
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: civicmind_x
+      DB_USER: civic_user
+      DB_PASSWORD: civic_password_2026
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: civicmind_x_db
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2026
+      MYSQL_DATABASE: civicmind_x
+      MYSQL_USER: civic_user
+      MYSQL_PASSWORD: civic_password_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1_schema.sql
+      - ./database/seeders.sql:/docker-entrypoint-initdb.d/2_seeders.sql
+
+volumes:
+  mysql_data:
